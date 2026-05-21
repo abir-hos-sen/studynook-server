@@ -48,7 +48,7 @@ const seedDatabase = async () => {
                 {
                     name: 'Creative Collaborative Hub',
                     description: 'Perfect for group brainstorming sessions, presentations, and group projects. Features a massive 4K TV screen, double-sided whiteboard, and movable tables.',
-                    image: 'https://images.unsplash.com/photo-1517502884422-41eaaced0168?w=600',
+                    image: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600',
                     floor: '2nd Floor',
                     capacity: 8,
                     hourlyRate: 10,
@@ -81,7 +81,7 @@ const seedDatabase = async () => {
                 {
                     name: 'The Boardroom Study Area',
                     description: 'A formal workspace tailored for student organizations, presentations, or executive student meetings. Premium mahogany table and videoconferencing suite.',
-                    image: 'https://images.unsplash.com/photo-1542744094-3a31f103e35f?w=600',
+                    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=600',
                     floor: '1st Floor Executive Wing',
                     capacity: 12,
                     hourlyRate: 15,
