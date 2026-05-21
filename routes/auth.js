@@ -100,12 +100,21 @@ router.get('/me', verifyToken, async (req, res) => {
 // Update Profile
 router.put('/update-profile', verifyToken, async (req, res) => {
     try {
-        const { name, photoURL } = req.body;
+        const { name, photoURL, phone, birthday, email } = req.body;
         if (!name) return res.status(400).json({ message: 'Name is required' });
+
+        // Check if new email is already taken by another user
+        if (email) {
+            const existingUser = await User.findOne({ email, _id: { $ne: req.user.id } });
+            if (existingUser) return res.status(400).json({ message: 'This email is already in use by another account' });
+        }
+
+        const updateData = { name, photoURL, phone, birthday };
+        if (email) updateData.email = email;
 
         const user = await User.findByIdAndUpdate(
             req.user.id,
-            { name, photoURL },
+            updateData,
             { new: true }
         ).select('-password');
 
