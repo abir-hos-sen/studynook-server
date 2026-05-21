@@ -14,6 +14,7 @@ const generateTokenAndSetCookie = (res, userId) => {
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
+    return token;
 };
 
 // Register
@@ -47,8 +48,8 @@ router.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid email or password' });
 
-        generateTokenAndSetCookie(res, user._id);
-        res.json({ message: 'Login successful', user: { _id: user._id, name: user.name, email: user.email, photoURL: user.photoURL } });
+        const token = generateTokenAndSetCookie(res, user._id);
+        res.json({ message: 'Login successful', token, user: { _id: user._id, name: user.name, email: user.email, photoURL: user.photoURL } });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -68,8 +69,8 @@ router.post('/google', async (req, res) => {
             await user.save();
         }
 
-        generateTokenAndSetCookie(res, user._id);
-        res.json({ message: 'Google login successful', user: { _id: user._id, name: user.name, email: user.email, photoURL: user.photoURL } });
+        const token = generateTokenAndSetCookie(res, user._id);
+        res.json({ message: 'Google login successful', token, user: { _id: user._id, name: user.name, email: user.email, photoURL: user.photoURL } });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -77,7 +78,11 @@ router.post('/google', async (req, res) => {
 
 // Logout
 router.post('/logout', (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+    });
     res.json({ message: 'Logged out successfully' });
 });
 
@@ -87,6 +92,25 @@ router.get('/me', verifyToken, async (req, res) => {
         const user = await User.findById(req.user.id).select('-password');
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Update Profile
+router.put('/update-profile', verifyToken, async (req, res) => {
+    try {
+        const { name, photoURL } = req.body;
+        if (!name) return res.status(400).json({ message: 'Name is required' });
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { name, photoURL },
+            { new: true }
+        ).select('-password');
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.json({ message: 'Profile updated successfully', user });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
