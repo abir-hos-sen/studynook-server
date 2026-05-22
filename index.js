@@ -4,6 +4,9 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
+// Trust the first proxy (Vercel) so secure cookies are set correctly in production
+app.set('trust proxy', 1);
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
