@@ -22,3 +22,4 @@ This is the Express.js backend for the StudyNook application.
 - Bcrypt.js
 - Cookie Parser
 - Cors
+live link : https://studynook-server-vert.vercel.app
